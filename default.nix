@@ -2,7 +2,10 @@
 , llvmPackages_11
 , cmake
 , spdlog
-, abseil-cpp }:
+, abseil-cpp
+, cudaPackages
+, hdf5
+, hdf5-cpp }:
 
 llvmPackages_11.stdenv.mkDerivation rec {
   pname = "cpp-examples";
@@ -10,8 +13,19 @@ llvmPackages_11.stdenv.mkDerivation rec {
   
   src = ./.;
 
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [ spdlog abseil-cpp ];
+  nativeBuildInputs = [ cmake
+        cudaPackages.cudatoolkit
+
+
+                      ];
+  buildInputs = [ spdlog
+                  abseil-cpp
+        cudaPackages.cudatoolkit
+                  hdf5
+                  hdf5-cpp
+
+
+                ];
 
   cmakeFlags = [
     "-DENABLE_TESTING=OFF"

@@ -29,10 +29,11 @@
       # Uncomment this if you need unfree software (e.g. cuda) for
       # your project.
       #
-      # config.allowUnfree = true;
+      config.allowUnfree = true;
+      config.cudaSupport = true;
     };
   in {
-    devShells.default = pkgs.mkShell rec {
+    devShells.default = pkgs.mkShell.override {stdenv = pkgs.cudaPackages.backendStdenv;} rec {
       # Update the name to something that suites your project.
       name = "my-c++-project";
 
@@ -48,6 +49,11 @@
         # Build time and Run time dependencies
         spdlog
         abseil-cpp
+
+
+        cudaPackages.cudatoolkit
+        hdf5
+        hdf5-cpp
       ];
 
       # Setting up the environment variables you need during
@@ -55,6 +61,8 @@
       shellHook = let
         icon = "f121";
       in ''
+        export CUDA_PATH="${pkgs.cudatoolkit}"
+        export CLANGD_CUDA_INCLUDE="${pkgs.cudatoolkit}"
         export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
       '';
     };

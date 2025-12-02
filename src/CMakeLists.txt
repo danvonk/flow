@@ -14,7 +14,6 @@ target_sources(tflow
 target_link_libraries(tflow PRIVATE
   spdlog::spdlog
   CUDA::cudart
-  CUDA::cufft
   hdf5::hdf5_cpp
   hdf5::hdf5
   hdf5::hdf5_hl_cpp
