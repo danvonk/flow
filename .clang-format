@@ -1,0 +1,6 @@
+﻿---
+BasedOnStyle: LLVM
+PackConstructorInitializers: 'Never'
+BreakBeforeBraces: 'Stroustrup'
+
+...
