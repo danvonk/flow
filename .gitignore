@@ -43,3 +43,5 @@ result
 # Env
 .direnv
 .envrc
+
+compile_commands.json

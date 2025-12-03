@@ -5,24 +5,24 @@
 , abseil-cpp
 , cudaPackages
 , hdf5
-, hdf5-cpp }:
+, hdf5-cpp
+, boost }:
 
-llvmPackages_11.stdenv.mkDerivation rec {
-  pname = "cpp-examples";
+cudaPackages.backendStdenv.mkDerivation rec {
+  pname = "tflow";
   version = "0.1.0";
   
   src = ./.;
 
   nativeBuildInputs = [ cmake
         cudaPackages.cudatoolkit
-
-
                       ];
   buildInputs = [ spdlog
                   abseil-cpp
-        cudaPackages.cudatoolkit
+                  cudaPackages.cudatoolkit
                   hdf5
                   hdf5-cpp
+                  boost
 
 
                 ];
