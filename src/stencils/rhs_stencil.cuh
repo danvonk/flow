@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.hpp"
+
 namespace stencils {
 class RHSStencil {
 public:
