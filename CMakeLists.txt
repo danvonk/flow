@@ -12,6 +12,7 @@ project(turb
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ############################
 ##  Modules and scripts   ##
@@ -50,6 +51,7 @@ set(${PROJECT_NAME}_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NA
 find_package(spdlog REQUIRED)
 find_package(CUDAToolkit REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
+find_package(Boost CONFIG REQUIRED COMPONENTS program_options)
 
 if(ENABLE_TESTING)
     find_package(GTest REQUIRED)
@@ -89,10 +91,6 @@ if(ENABLE_INSTALL)
         TARGETS tflow
         EXPORT ${PROJECT_NAME}_Targets
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-    install(DIRECTORY src
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-        FILES_MATCHING PATTERN *.h)
 
     # This time, install all the exported targets under the
     # ${PROJECT_NAME}_Targets name.

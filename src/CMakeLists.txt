@@ -4,6 +4,7 @@ target_sources(tflow
   PRIVATE
   simulation.hpp
   parameters.hpp
+  parameters.cpp
   config.hpp
   fields/flow_field.hpp
   fields/field.hpp
@@ -18,7 +19,13 @@ target_link_libraries(tflow PRIVATE
   hdf5::hdf5
   hdf5::hdf5_hl_cpp
   hdf5::hdf5_hl
+  Boost::program_options
+  Boost::boost # target for header-only libraries
 )
+
+target_include_directories(tflow
+PRIVATE
+${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS tflow)
 
