@@ -3,12 +3,20 @@ add_executable(tflow)
 target_sources(tflow
   PRIVATE
   simulation.hpp
+  simulation.cu
+  simulation_impl.cuh
+  simulation_impl.cu
   parameters.hpp
   parameters.cpp
   config.hpp
   fields/flow_field.hpp
+  fields/flow_field.cpp
   fields/field.hpp
+  stencils/stencil.hpp
+  stencils/iterator.cuh
   stencils/rhs_stencil.cuh
+  stencils/fgh_stencil.cuh
+  stencils/moving_wall_stencil.cuh
   main.cpp)
 
 

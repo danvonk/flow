@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "fields/field.hpp"
+#include "fields/flow_field.hpp"
 #include "parameters.hpp"
 #include "simulation.hpp"
 
@@ -32,7 +32,7 @@ auto main(int argc, char *argv[]) -> int
   params::Parameters params;
   if (vm.count("config")) {
     spdlog::info("Using config file {}", vm["config"].as<std::string>());
-    params.load_config(vm["config"].as<std::string>());
+    params = params::load_config(vm["config"].as<std::string>());
   }
 
   // init cuda
@@ -51,6 +51,19 @@ auto main(int argc, char *argv[]) -> int
   }
 
   // create the simulation
+
+  FlowField ff(params);
+  Simulation flow_sim(ff);
+
+  flow_sim.initFlowField();
+
+  Real time = 0.0;
+  // while (time < params.sim.final_time) {
+  flow_sim.solveTimestep();
+  time += params.timestep.dt;
+
+  // break;
+  // }
 
   return 0;
 }
