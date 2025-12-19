@@ -13,13 +13,13 @@ void VTKWriter::write_flow_field(FlowField &field, Real dt)
   field.velocity()->to_host(velocity_data);
   field.pressure()->to_host(pressure_data);
 
-  for (auto j = 0; j < field.Ny(); ++j) {
-    for (auto i = 0; i < field.Nx(); ++i) {
-      std::cout << velocity_data[2 * (i + (field.Nx() + 3) * j) + 0] << ","
-                << velocity_data[2 * (i + (field.Nx() + 3) * j) + 1] << " ";
-    }
-    std::cout << '\n';
-  }
+  // for (auto j = 0; j < field.Ny(); ++j) {
+  //   for (auto i = 0; i < field.Nx(); ++i) {
+  //     std::cout << velocity_data[2 * (i + (field.Nx() + 3) * j) + 0] << ","
+  //               << velocity_data[2 * (i + (field.Nx() + 3) * j) + 1] << " ";
+  //   }
+  //   std::cout << '\n';
+  // }
 
   vtkNew<vtkImageData> image;
   image->SetOrigin(0, 0, 0);
@@ -55,6 +55,7 @@ void VTKWriter::write_flow_field(FlowField &field, Real dt)
 
   image->GetCellData()->AddArray(velocity);
 
+  // TODO: use std::format etc.
   char buffer[256];
   sprintf(buffer, "flow%f.vti", dt);
 

@@ -8,7 +8,9 @@ SimulationImpl::SimulationImpl(FlowField &field)
       fgh_iterator_(field.view(), stencils::FGHStencil()),
       wall_v_iterator_(field.view(), stencils::MovingWallVelocityStencil()),
       wall_fgh_iterator_(field.view(), stencils::MovingWallFGHStencil()),
-      rhs_iterator_(field.view(), stencils::RHSStencil())
+      rhs_iterator_(field.view(), stencils::RHSStencil()),
+      velocity_stencil_(field.view(), stencils::VelocityStencil()),
+      obstacle_stencil_(field.view(), stencils::ObstacleStencil())
 {
 }
 
@@ -23,6 +25,9 @@ void SimulationImpl::solveTimestep()
   rhs_iterator_.iterate();
 
   // TODO: solve for pressure
+  velocity_stencil_.iterate();
+  obstacle_stencil_.iterate();
+  wall_v_iterator_.iterate();
 }
 
 void SimulationImpl::run()

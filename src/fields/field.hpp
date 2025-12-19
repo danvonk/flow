@@ -80,6 +80,8 @@ public:
     int *data;
     int Nx;
     int Ny;
+
+    HD inline int &get(int i, int j) { return data[i + Nx * j]; }
   };
 
   inline IntScalarFieldView view() const { return {data_, sizeX_, sizeY_}; };

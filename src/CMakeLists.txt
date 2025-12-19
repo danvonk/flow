@@ -10,6 +10,7 @@ target_sources(tflow
   parameters.cu
   vtk_writer.hpp
   vtk_writer.cpp
+  sor_solver.cuh
   config.hpp
   fields/flow_field.hpp
   fields/flow_field.cpp
@@ -18,6 +19,8 @@ target_sources(tflow
   stencils/iterator.cuh
   stencils/rhs_stencil.cuh
   stencils/fgh_stencil.cuh
+  stencils/velocity_stencil.cuh
+  stencils/obstacle_stencil.cuh
   stencils/moving_wall_stencil.cuh
   main.cpp)
 

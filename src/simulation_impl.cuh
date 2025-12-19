@@ -5,9 +5,9 @@
 #include "stencils/fgh_stencil.cuh"
 #include "stencils/iterator.cuh"
 #include "stencils/moving_wall_stencil.cuh"
+#include "stencils/obstacle_stencil.cuh"
 #include "stencils/rhs_stencil.cuh"
-
-#include "vtk_writer.hpp"
+#include "stencils/velocity_stencil.cuh"
 
 class SimulationImpl {
 public:
@@ -26,4 +26,6 @@ protected:
   BoundaryIterator<stencils::MovingWallVelocityStencil> wall_v_iterator_;
   BoundaryIterator<stencils::MovingWallFGHStencil> wall_fgh_iterator_;
   FieldIterator<stencils::RHSStencil> rhs_iterator_;
+  FieldIterator<stencils::VelocityStencil> velocity_stencil_;
+  FieldIterator<stencils::ObstacleStencil> obstacle_stencil_;
 };
