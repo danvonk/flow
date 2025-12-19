@@ -11,9 +11,7 @@ public:
   Simulation(FlowField &field);
   ~Simulation();
 
-  void initFlowField();
-  void solveTimestep();
-  void setTimestep();
+  void run();
 
 private:
   SimulationImpl *impl_;

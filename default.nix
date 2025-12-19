@@ -4,8 +4,7 @@
 , spdlog
 , abseil-cpp
 , cudaPackages
-, hdf5
-, hdf5-cpp
+, vtk
 , boost }:
 
 cudaPackages.backendStdenv.mkDerivation rec {
@@ -20,8 +19,7 @@ cudaPackages.backendStdenv.mkDerivation rec {
   buildInputs = [ spdlog
                   abseil-cpp
                   cudaPackages.cudatoolkit
-                  hdf5
-                  hdf5-cpp
+                  vtk
                   boost
 
 

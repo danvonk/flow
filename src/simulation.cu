@@ -12,8 +12,4 @@ Simulation::Simulation(FlowField &field)
 
 Simulation::~Simulation() { delete impl_; }
 
-void Simulation::initFlowField() { impl_->initFlowField(); }
-
-void Simulation::solveTimestep() { impl_->solveTimestep(); }
-
-void Simulation::setTimestep() { impl_->setTimestep(); }
+void Simulation::run() { impl_->run(); }

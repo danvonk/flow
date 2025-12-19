@@ -2,6 +2,7 @@
 
 #include "config.hpp"
 
+#include <cuda.h>
 #include <string>
 
 namespace params {
@@ -22,57 +23,60 @@ static constexpr int OBSTACLE_TOP = 1 << 4;
 static constexpr int OBSTACLE_FRONT = 1 << 5;
 static constexpr int OBSTACLE_BACK = 1 << 6;
 
-struct Timestep {
-  Real dt = 1.0;
-  Real tau = 1.0;
-  Real gamma = 1.0; // central vs upwind scheme balance coeff
-};
-
 struct Simulation {
-  Real final_time = 100;
-  Real reynolds = 1000;
+  Real final_time;
+  Real reynolds;
 
   // gravity
-  Real gx = 0.0;
-  Real gy = 0.0;
+  Real gx;
+  Real gy;
 };
 
 struct Mesh {
-  Real sizeX = 1.;
-  Real sizeY = 1.;
+  Real sizeX;
+  Real sizeY;
 
-  int cellsX = 100;
-  int cellsY = 100;
+  int cellsX;
+  int cellsY;
 
   Real mesh_dx;
   Real mesh_dy;
 };
 
 struct Wall {
-  Real scalar_left = 0.0;
-  Real scalar_right = 0.0;
-  Real scalar_top = 0.0;
-  Real scalar_bottom = 0.0;
+  Real scalar_left;
+  Real scalar_right;
+  Real scalar_top;
+  Real scalar_bottom;
 
   // define the velocities at the boundaries
-  Real vector_left[2] = {0, 0};
-  Real vector_right[2] = {0, 0};
-  Real vector_top[2] = {1, 0};
-  Real vector_bottom[2] = {0, 0};
+  Real vector_left[2];
+  Real vector_right[2];
+  Real vector_top[2];
+  Real vector_bottom[2];
 
-  BoundaryType boundary_left = BoundaryType::DIRICHLET;
-  BoundaryType boundary_right = BoundaryType::DIRICHLET;
-  BoundaryType boundary_top = BoundaryType::DIRICHLET;
-  BoundaryType boundary_bottom = BoundaryType::DIRICHLET;
+  BoundaryType boundary_left;
+  BoundaryType boundary_right;
+  BoundaryType boundary_top;
+  BoundaryType boundary_bottom;
 };
 
 struct Parameters {
-  Timestep timestep;
   Simulation sim;
   Mesh mesh;
   Wall wall;
 };
 
+struct Timestep {
+  Real dt;
+  Real tau;
+  Real gamma; // central vs upwind scheme balance coeff
+};
+
 Parameters load_config(const std::string &file_path);
 
 } // namespace params
+
+// These live on the CUDA device
+extern __constant__ params::Parameters c_params;
+extern __device__ params::Timestep d_timestep;

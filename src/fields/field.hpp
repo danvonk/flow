@@ -33,8 +33,7 @@ public:
   void to_host(std::vector<T> &host)
   {
     host.resize(sizeX_ * sizeY_ * components_);
-    cudaMemcpy(host.data(), data_, host.size() * sizeof(T),
-               cudaMemcpyDeviceToHost);
+    cudaMemcpy(host.data(), data_, host.size(), cudaMemcpyDeviceToHost);
   }
 
   Field(const Field &) = delete;
@@ -63,6 +62,8 @@ public:
     Real *data;
     int Nx;
     int Ny;
+
+    HD inline Real &get(int i, int j) { return data[i + Nx * j]; }
   };
 
   ScalarFieldView view() const { return {data_, sizeX_, sizeY_}; };
@@ -92,13 +93,13 @@ public:
   }
 
   struct VectorFieldView {
-    Real *data_;
+    Real *data;
     int Nx;
     int Ny;
 
-    HD inline Real &u(int i, int j) { return data_[2 * (i + Nx * j) + 0]; }
+    HD inline Real &u(int i, int j) { return data[2 * (i + Nx * j) + 0]; }
 
-    HD inline Real &v(int i, int j) { return data_[2 * (i + Nx * j) + 1]; }
+    HD inline Real &v(int i, int j) { return data[2 * (i + Nx * j) + 1]; }
   };
 
   VectorFieldView view() const { return {data_, sizeX_, sizeY_}; };

@@ -6,7 +6,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "Do not build in-source. Please remove CMakeCache.txt and the CMakeFiles/ directory. Then build out-of-source.")
 endif()
 
-project(turb
+project(turby
     VERSION 0.1.0
     LANGUAGES C CXX CUDA)
 
@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CUDA_ARCHITECTURES 86) # Perhaps change if compat needed
 
 ############################
 ##  Modules and scripts   ##
@@ -27,6 +28,7 @@ include(GNUInstallDirs)                 # This will define the default values fo
 include(InstallRequiredSystemLibraries) # Tell CMake that the `install` target needs to install required system libraries (eg: Windows SDK)
 include(CMakePackageConfigHelpers)      # Helper to create relocatable packages
 
+cmake_policy(SET CMP0167 NEW)
 
 # Custom modules and scripts
 
@@ -51,7 +53,7 @@ set(${PROJECT_NAME}_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NA
 
 find_package(spdlog REQUIRED)
 find_package(CUDAToolkit REQUIRED)
-find_package(HDF5 REQUIRED COMPONENTS C CXX HL)
+find_package(VTK REQUIRED COMPONENTS IOHDF)
 find_package(Boost CONFIG REQUIRED COMPONENTS program_options)
 
 if(ENABLE_TESTING)

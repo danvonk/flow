@@ -5,6 +5,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+namespace stencils {
 struct MovingWallVelocityStencil {
 
   __device__ void apply_left_wall(FlowFieldView &field, int i, int j)
@@ -57,3 +58,4 @@ struct MovingWallFGHStencil {
     field.fgh.v(i, j - 1) = field.params.wall.vector_top[1];
   }
 };
+} // namespace stencils

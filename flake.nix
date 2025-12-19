@@ -46,8 +46,6 @@
         spdlog
         abseil-cpp
         cudaPackages.cudatoolkit
-        hdf5
-        hdf5-cpp
         boost
       ];
 

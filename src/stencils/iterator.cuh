@@ -7,6 +7,7 @@
 
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <spdlog/spdlog.h>
 
 namespace iter_kernels {
 template <typename Stencil>
@@ -19,7 +20,7 @@ __global__ void apply_stencil_kernel(FlowFieldView flow, Stencil stencil,
   if (i >= i1 || j >= j1)
     return;
 
-  stencil(flow, i, j); // call stencil on device
+  stencil(flow, i, j);
 }
 
 template <typename Stencil>
@@ -72,6 +73,7 @@ public:
 
   void iterate(cudaStream_t stream = 0)
   {
+    spdlog::info("iterate field...");
     int cellsX = field_.cellsX;
     int cellsY = field_.cellsY;
 
@@ -120,8 +122,6 @@ public:
     int right_i = cellsX + high_offset_ - 1;
     int bot_j = low_offset_;
     int top_j = cellsY + high_offset_ - 1;
-
-    constexpr int TPB = 256; // threads per block
 
     int nJ = j1 - j0;
     dim3 blockJ(TPB);

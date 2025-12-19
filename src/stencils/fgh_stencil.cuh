@@ -8,6 +8,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
+namespace stencils {
 struct FGHStencil {
 private:
   __device__ inline Real du2dx(FlowFieldView &field, int i, int j)
@@ -35,7 +36,7 @@ private:
                              fabs(kr) * (u_0 - u_1) - fabs(kl) * (u_M1 - u_0));
 
     // Return linear combination of central- and upwind difference
-    const auto gamma = field.params.timestep.gamma;
+    const auto gamma = d_timestep.gamma;
     return (1.0 - gamma) * secondOrder + gamma * firstOrder;
   }
 
@@ -70,7 +71,7 @@ private:
                             (kr * (v0 + v1) - kl * (vM1 + v0) +
                              fabs(kr) * (v0 - v1) - fabs(kl) * (vM1 - v0));
 
-    const auto gamma = field.params.timestep.gamma;
+    const auto gamma = d_timestep.gamma;
     const auto tmp2 = (1.0 - gamma) * secondOrder + gamma * firstOrder;
 
     return tmp2;
@@ -118,7 +119,7 @@ private:
     const auto kl =
         (hxLong - hxShort) / hxLong * v0M1 + hxShort / hxLong * v1M1;
 
-    const auto gamma = field.params.timestep.gamma;
+    const auto gamma = d_timestep.gamma;
     const auto firstOrder = 1.0 / (4.0 * hyShort) *
                             (kr * (u00 + u01) - kl * (u0M1 + u00) +
                              fabs(kr) * (u00 - u01) - fabs(kl) * (u0M1 - u00));
@@ -184,7 +185,7 @@ private:
 
     // Return linear combination of central and donor-cell difference
 
-    const auto gamma = field.params.timestep.gamma;
+    const auto gamma = d_timestep.gamma;
     const auto tmp2 = (1.0 - gamma) * secondOrder + gamma * firstOrder;
 
     return tmp2;
@@ -237,7 +238,7 @@ private:
 public:
   __device__ void operator()(FlowFieldView &field, int i, int j)
   {
-    const auto dt = field.params.timestep.dt;
+    const auto dt = d_timestep.dt;
     // compute F
     {
       auto u_current = field.v.u(i, j);
@@ -261,3 +262,5 @@ public:
     }
   }
 };
+
+} // namespace stencils
