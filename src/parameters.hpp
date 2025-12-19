@@ -33,9 +33,11 @@ struct Simulation {
 };
 
 struct Mesh {
-  Real sizeX;
-  Real sizeY;
+  // physical dimensions
+  Real lengthX;
+  Real lengthY;
 
+  // number of (non-ghost) cells
   int cellsX;
   int cellsY;
 

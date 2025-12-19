@@ -30,7 +30,7 @@ public:
 
   virtual ~Field() { cudaFree(data_); }
 
-  void to_host(std::vector<T> &host)
+  void to_host(std::vector<T> &host) const
   {
     host.resize(sizeX_ * sizeY_ * components_);
     cudaMemcpy(host.data(), data_, host.size(), cudaMemcpyDeviceToHost);

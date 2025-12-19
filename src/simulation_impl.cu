@@ -1,4 +1,5 @@
 #include "simulation_impl.cuh"
+#include "vtk_writer.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -28,4 +29,7 @@ void SimulationImpl::run()
 {
   Real time = 0.0;
   solveTimestep();
+
+  VTKWriter writer;
+  writer.write_flow_field(flow_, 0.0);
 }

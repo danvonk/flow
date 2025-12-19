@@ -14,8 +14,7 @@ private:
   __device__ inline Real du2dx(FlowFieldView &field, int i, int j)
   {
     const auto dx_short = 0.5 * field.v.u(i, j);
-    const auto dx_long1 =
-        0.5 * (field.params.mesh.mesh_dx + field.params.mesh.mesh_dx);
+    const auto dx_long1 = 0.5 * (c_params.mesh.mesh_dx + c_params.mesh.mesh_dx);
 
     const auto u_0 = field.v.u(i, j);
     const auto u_M1 = field.v.u(i - 1, j);
@@ -42,7 +41,7 @@ private:
 
   __device__ inline Real dv2dy(FlowFieldView &field, int i, int j)
   {
-    const auto dy = field.params.mesh.mesh_dy;
+    const auto dy = c_params.mesh.mesh_dy;
     const auto dyShort = 0.5 * dy;
     // const auto dyLong0 = 0.5*(lm[mapd(0,-1,0,1)] + lm[mapd(0,0,0,1)]);
     const auto dyLong1 = 0.5 * (dy + dy);
@@ -82,22 +81,21 @@ private:
 
     // TODO: simplify now we only use uniform grids
     const auto hyShort =
-        0.5 * field.params.mesh.mesh_dy; // Distance of corner points in
-                                         // x-direction from center v-value
+        0.5 * c_params.mesh.mesh_dy; // Distance of corner points in
+                                     // x-direction from center v-value
     const auto hyLong0 =
-        0.5 * (field.params.mesh.mesh_dy +
-               field.params.mesh.mesh_dy); // Distance between center
-                                           // and west v-value
+        0.5 * (c_params.mesh.mesh_dy +
+               c_params.mesh.mesh_dy); // Distance between center
+                                       // and west v-value
     const auto hyLong1 =
-        0.5 * (field.params.mesh.mesh_dy +
-               field.params.mesh.mesh_dy); // Distance between center and
-                                           // east v-value
+        0.5 * (c_params.mesh.mesh_dy +
+               c_params.mesh.mesh_dy); // Distance between center and
+                                       // east v-value
 
     // Distance of center u-value from upper edge of cell
-    const auto hxShort = 0.5 * field.params.mesh.mesh_dy;
+    const auto hxShort = 0.5 * c_params.mesh.mesh_dy;
     // Distance of north and center u-value
-    const auto hxLong =
-        0.5 * (field.params.mesh.mesh_dy + field.params.mesh.mesh_dy);
+    const auto hxLong = 0.5 * (c_params.mesh.mesh_dy + c_params.mesh.mesh_dy);
 
     const auto v00 = field.v.v(i, j);
     const auto v10 = field.v.v(i + 1, j);
@@ -133,22 +131,21 @@ private:
   {
     // TODO: simplify for uniform grids
     const auto hxShort =
-        0.5 * field.params.mesh.mesh_dx; // Distance of corner points in
-                                         // x-direction from center v-value
+        0.5 * c_params.mesh.mesh_dx; // Distance of corner points in
+                                     // x-direction from center v-value
     const auto hxLong0 =
-        0.5 * (field.params.mesh.mesh_dx +
-               field.params.mesh.mesh_dx); // Distance between center and
-                                           // west v-value
+        0.5 * (c_params.mesh.mesh_dx +
+               c_params.mesh.mesh_dx); // Distance between center and
+                                       // west v-value
     const auto hxLong1 =
-        0.5 * (field.params.mesh.mesh_dx +
-               field.params.mesh.mesh_dx); // Distance between center and
-                                           // east v-value
+        0.5 * (c_params.mesh.mesh_dx +
+               c_params.mesh.mesh_dx); // Distance between center and
+                                       // east v-value
 
     // Distance of center u-value from upper edge of cell
-    const auto hyShort = 0.5 * field.params.mesh.mesh_dy;
+    const auto hyShort = 0.5 * c_params.mesh.mesh_dy;
     // Distance of north and center u-value
-    const auto hyLong =
-        0.5 * (field.params.mesh.mesh_dy + field.params.mesh.mesh_dy);
+    const auto hyLong = 0.5 * (c_params.mesh.mesh_dy + c_params.mesh.mesh_dy);
 
     const auto u00 = field.v.u(i, j);
     const auto u01 = field.v.u(i, j + 1);
@@ -197,7 +194,7 @@ private:
     auto u_im1 = field.v.u(i - 1, j);
     auto u_ip1 = field.v.u(i + 1, j);
 
-    auto dx = field.params.mesh.mesh_dx;
+    auto dx = c_params.mesh.mesh_dx;
 
     return (u_ip1 - 2. * u_i + u_im1) / (dx * dx);
   }
@@ -208,7 +205,7 @@ private:
     auto u_jm1 = field.v.u(i, j - 1);
     auto u_jp1 = field.v.u(i, j + 1);
 
-    const auto dy = field.params.mesh.mesh_dy;
+    const auto dy = c_params.mesh.mesh_dy;
 
     return (u_jp1 - 2. * u_i + u_jm1) / (dy * dy);
   }
@@ -219,7 +216,7 @@ private:
     auto v_im1 = field.v.v(i - 1, j);
     auto v_ip1 = field.v.v(i + 1, j);
 
-    const auto dx = field.params.mesh.mesh_dx;
+    const auto dx = c_params.mesh.mesh_dx;
 
     return (v_ip1 - 2. * v_i + v_im1) / (dx * dx);
   }
@@ -230,7 +227,7 @@ private:
     auto v_jm1 = field.v.v(i, j - 1);
     auto v_jp1 = field.v.v(i, j + 1);
 
-    const auto dy = field.params.mesh.mesh_dy;
+    const auto dy = c_params.mesh.mesh_dy;
 
     return (v_jp1 - 2. * v_i + v_jm1) / (dy * dy);
   }
@@ -243,9 +240,9 @@ public:
     {
       auto u_current = field.v.u(i, j);
       const auto advection = -du2dx(field, i, j) - duvdy(field, i, j);
-      const auto force = field.params.sim.gx;
+      const auto force = c_params.sim.gx;
       auto diffusion = d2udx2(field, i, j) + d2udy2(field, i, j);
-      diffusion *= (1.0 / field.params.sim.reynolds);
+      diffusion *= (1.0 / c_params.sim.reynolds);
 
       field.fgh.u(i, j) = dt * (advection + diffusion + force);
     }
@@ -254,9 +251,9 @@ public:
     {
       auto v_current = field.v.v(i, j);
       const auto advection = -dv2dy(field, i, j) - duvdx(field, i, j);
-      const auto force = field.params.sim.gy;
+      const auto force = c_params.sim.gy;
       auto diffusion = d2vdx2(field, i, j) + d2vdy2(field, i, j);
-      diffusion *= (1.0 / field.params.sim.reynolds);
+      diffusion *= (1.0 / c_params.sim.reynolds);
 
       field.fgh.v(i, j) = dt * (advection + diffusion + force);
     }

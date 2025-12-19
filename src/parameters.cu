@@ -35,12 +35,12 @@ Parameters params::load_config(const std::string &file_path)
   p.sim.gy = tree.get<Real>("simulation.gy", 0.0);
 
   // Mesh params
-  p.mesh.sizeX = tree.get<Real>("mesh.lengthX", 1);
-  p.mesh.sizeY = tree.get<Real>("mesh.lengthY", 1);
+  p.mesh.lengthX = tree.get<Real>("mesh.lengthX", 1);
+  p.mesh.lengthY = tree.get<Real>("mesh.lengthY", 1);
   p.mesh.cellsX = tree.get<int>("mesh.cellsX", 100);
   p.mesh.cellsY = tree.get<int>("mesh.cellsY", 100);
-  p.mesh.mesh_dx = p.mesh.sizeX / p.mesh.cellsX;
-  p.mesh.mesh_dy = p.mesh.sizeY / p.mesh.cellsY;
+  p.mesh.mesh_dx = p.mesh.lengthX / p.mesh.cellsX;
+  p.mesh.mesh_dy = p.mesh.lengthY / p.mesh.cellsY;
 
   // Wall params
   p.wall.scalar_left = tree.get<Real>("wall.scalar_left", 0.0);

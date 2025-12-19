@@ -3,16 +3,15 @@
 #include "config.hpp"
 #include "fields/flow_field.hpp"
 
-#include <vtk/vtkHDFReader.h>
-#include <vtk/vtkIOHDFModule.h>
-#include <vtk/vtkImageData.h>
+#include <vtkImageData.h>
+#include <vtkXMLImageDataWriter.h>
 
 class VTKWriter {
 public:
-  VTKWriter();
+  VTKWriter() {};
 
-  void write_flow_field(FlowField &field);
+  void write_flow_field(FlowField &field, Real dt);
 
 private:
-  vtkHDFWriter wr_;
+  vtkNew<vtkXMLImageDataWriter> writer_;
 };

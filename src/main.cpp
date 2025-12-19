@@ -53,7 +53,8 @@ auto main(int argc, char *argv[]) -> int
   params = params::load_config(config_file);
 
   // create the simulation
-  FlowField ff(params);
+  FlowField ff(&params);
+  spdlog::info("Created flow field of {}x{} size", ff.Nx(), ff.Ny());
   Simulation flow_sim(ff);
 
   flow_sim.run();
