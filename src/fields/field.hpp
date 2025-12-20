@@ -78,6 +78,7 @@ public:
 
   struct IntScalarFieldView {
     int *data;
+    // includes boundary cells in array
     int Nx;
     int Ny;
 
@@ -96,6 +97,7 @@ public:
 
   struct VectorFieldView {
     Real *data;
+    // includes boundary cells in array
     int Nx;
     int Ny;
 

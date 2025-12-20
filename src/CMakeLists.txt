@@ -11,7 +11,10 @@ target_sources(tflow
   vtk_writer.hpp
   vtk_writer.cpp
   sor_solver.cuh
+  sor_solver.cu
   config.hpp
+  cfl_helpers.cuh
+  cfl_helpers.cu
   fields/flow_field.hpp
   fields/flow_field.cpp
   fields/field.hpp
@@ -28,6 +31,7 @@ target_sources(tflow
 target_link_libraries(tflow PRIVATE
   spdlog::spdlog
   CUDA::cudart
+  CUDA::cublas
   Boost::program_options
   VTK::IOHDF
   VTK::IOXML

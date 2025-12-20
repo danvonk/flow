@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "fields/flow_field.hpp"
+#include "parameters.hpp"
 
 class SimulationImpl;
 

@@ -10,7 +10,7 @@ class VTKWriter {
 public:
   VTKWriter() {};
 
-  void write_flow_field(FlowField &field, Real dt);
+  void write_flow_field(FlowField &field, Real time);
 
 private:
   vtkNew<vtkXMLImageDataWriter> writer_;

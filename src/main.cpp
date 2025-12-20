@@ -54,7 +54,7 @@ auto main(int argc, char *argv[]) -> int
 
   // create the simulation
   FlowField ff(&params);
-  spdlog::info("Created flow field of {}x{} size", ff.Nx(), ff.Ny());
+  spdlog::info("Created flow field of size {}x{}", ff.Nx(), ff.Ny());
   Simulation flow_sim(ff);
 
   flow_sim.run();

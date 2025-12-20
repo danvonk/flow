@@ -5,7 +5,7 @@
 #include <vtkHDFWriter.h>
 #include <vtkImageData.h>
 
-void VTKWriter::write_flow_field(FlowField &field, Real dt)
+void VTKWriter::write_flow_field(FlowField &field, Real time)
 {
   std::vector<Real> velocity_data;
   std::vector<Real> pressure_data;
@@ -57,7 +57,7 @@ void VTKWriter::write_flow_field(FlowField &field, Real dt)
 
   // TODO: use std::format etc.
   char buffer[256];
-  sprintf(buffer, "flow%f.vti", dt);
+  sprintf(buffer, "flow%.0f.vti", time * 100);
 
   writer_->SetFileName(buffer);
   writer_->SetInputData(image);
