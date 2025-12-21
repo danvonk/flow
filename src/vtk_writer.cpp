@@ -2,7 +2,6 @@
 
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
-#include <vtkHDFWriter.h>
 #include <vtkImageData.h>
 
 void VTKWriter::write_flow_field(FlowField &field, Real time)
@@ -54,6 +53,24 @@ void VTKWriter::write_flow_field(FlowField &field, Real time)
   }
 
   image->GetCellData()->AddArray(velocity);
+
+  vtkNew<vtkDoubleArray> pressure;
+  pressure->SetName("pressure");
+  pressure->SetNumberOfComponents(1);
+  pressure->SetNumberOfTuples(field.Nx() * field.Ny());
+
+  ptr = pressure->GetPointer(0);
+  for (int j = 2; j <= field.Ny() + 1; ++j) {
+    for (int i = 2; i <= field.Nx() + 1; ++i) {
+
+      auto here = 2 * (i + NxTot * j);
+      const auto cell = (i - 2) + field.Nx() * (j - 2);
+
+      ptr[cell] = here;
+    }
+  }
+
+  image->GetCellData()->AddArray(pressure);
 
   // TODO: use std::format etc.
   char buffer[256];

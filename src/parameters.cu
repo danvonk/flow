@@ -33,6 +33,7 @@ Parameters params::load_config(const std::string &file_path)
   p.sim.reynolds = tree.get<Real>("simulation.reynolds", 1000);
   p.sim.gx = tree.get<Real>("simulation.gx", 0.0);
   p.sim.gy = tree.get<Real>("simulation.gy", 0.0);
+  p.sim.vtk_interval = tree.get<Real>("simulation.vtk_interval", 0.1);
 
   // Mesh params
   p.mesh.lengthX = tree.get<Real>("mesh.lengthX", 1);

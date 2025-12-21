@@ -5,9 +5,5 @@
 
 class SORSolver {
 public:
-  SORSolver(FlowField &field);
-  void solve();
-
-private:
-  FlowField &field_;
+  int solve(FlowFieldView field);
 };

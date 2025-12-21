@@ -60,6 +60,7 @@ public:
   // GPU-side view of the field
   struct ScalarFieldView {
     Real *data;
+    // includes boundary cells in array
     int Nx;
     int Ny;
 

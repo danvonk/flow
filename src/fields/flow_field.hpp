@@ -5,8 +5,9 @@
 
 // Device side view into flow field
 struct FlowFieldView {
-  int cellsX;
-  int cellsY;
+  // not including boundary cells
+  int Nx;
+  int Ny;
 
   IntScalarField::IntScalarFieldView obstacles;
   ScalarField::ScalarFieldView p;
@@ -24,8 +25,13 @@ public:
 
   inline FlowFieldView view() const
   {
-    return {cellsX_,          cellsY_,     obstacles_.view(), pressure_.view(),
-            velocity_.view(), FGH_.view(), RHS_.view()};
+    return {Nx_,
+            Ny_,
+            obstacles_.view(),
+            pressure_.view(),
+            velocity_.view(),
+            FGH_.view(),
+            RHS_.view()};
   };
 
   // number of field cells (no boundary)

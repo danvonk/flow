@@ -74,8 +74,8 @@ public:
   void iterate(cudaStream_t stream = 0)
   {
     spdlog::info("iterate field...");
-    int cellsX = field_.cellsX;
-    int cellsY = field_.cellsY;
+    int cellsX = field_.Nx + 3;
+    int cellsY = field_.Ny + 3;
 
     const int i0 = 1 + low_offset_;
     const int i1 = (cellsX - 1) + high_offset_;
@@ -110,8 +110,8 @@ public:
 
   void iterate(cudaStream_t stream = 0)
   {
-    int cellsX = field_.cellsX;
-    int cellsY = field_.cellsY;
+    int cellsX = field_.Nx + 3;
+    int cellsY = field_.Ny + 3;
 
     int j0 = low_offset_;
     int j1 = cellsY + high_offset_;

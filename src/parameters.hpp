@@ -30,6 +30,9 @@ struct Simulation {
   // gravity
   Real gx;
   Real gy;
+
+  // VTK params
+  Real vtk_interval;
 };
 
 struct Mesh {
