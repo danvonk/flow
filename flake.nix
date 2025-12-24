@@ -13,53 +13,61 @@
     utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, ... }@inputs: inputs.utils.lib.eachSystem [
-    # Add the system/architecture you would like to support here. Note that not
-    # all packages in the official nixpkgs support all platforms.
-    "x86_64-linux" "i686-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"
-  ] (system: let
-    pkgs = import nixpkgs {
-      inherit system;
+  outputs = { self, nixpkgs, ... }@inputs:
+    inputs.utils.lib.eachSystem [
+      # Add the system/architecture you would like to support here. Note that not
+      # all packages in the official nixpkgs support all platforms.
+      "x86_64-linux"
+      "i686-linux"
+      "aarch64-linux"
+      "x86_64-darwin"
+      "aarch64-darwin"
+    ] (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
 
-      # Add overlays here if you need to override the nixpkgs
-      # official packages.
-      overlays = [];
-      
-      # Uncomment this if you need unfree software (e.g. cuda) for
-      # your project.
-      #
-      config.allowUnfree = true;
-      config.cudaSupport = true;
-    };
-  in {
-    devShells.default = pkgs.mkShell.override {stdenv = pkgs.cudaPackages.backendStdenv;} rec {
-      # Update the name to something that suites your project.
-      name = "tflow";
+          # Add overlays here if you need to override the nixpkgs
+          # official packages.
+          overlays = [ ];
 
-      packages = with pkgs; [
-        # Development Tools
-        cmake
-        cmakeCurses
-        # Development time dependencies
-        gtest
-        # Build time and Run time dependencies
-        spdlog
-        abseil-cpp
-        cudaPackages.cudatoolkit
-        boost
-      ];
+          # Uncomment this if you need unfree software (e.g. cuda) for
+          # your project.
+          #
+          config.allowUnfree = true;
+          config.cudaSupport = true;
+        };
+      in {
+        devShells.default = pkgs.mkShell.override {
+          stdenv = pkgs.cudaPackages.backendStdenv;
+        } rec {
+          # Update the name to something that suites your project.
+          name = "tflow";
 
-      # Setting up the environment variables you need during
-      # development.
-      shellHook = let
-        icon = "f121";
-      in ''
-        export CUDA_PATH="${pkgs.cudatoolkit}"
-        export CUDA_VISIBLE_DEVICES=0
-        export PS1="$(echo -e '\u${icon}') {\[$(tput sgr0)\]\[\033[38;5;228m\]\w\[$(tput sgr0)\]\[\033[38;5;15m\]} (${name}) \\$ \[$(tput sgr0)\]"
-      '';
-    };
+          packages = with pkgs; [
+            # Development Tools
+            cmake
+            cmakeCurses
+            # Development time dependencies
+            gtest
+            # Build time and Run time dependencies
+            spdlog
+            abseil-cpp
+            cudaPackages.cudatoolkit
+            boost
+            vtk
+            clang-tools
+          ];
 
-    packages.default = pkgs.callPackage ./default.nix {};
-  });
+          # Setting up the environment variables you need during
+          # development.
+          shellHook = let icon = "f121";
+          in ''
+            export CUDA_PATH="${pkgs.cudatoolkit}"
+            export CUDA_VISIBLE_DEVICES=0
+          '';
+        };
+
+        packages.default = pkgs.callPackage ./default.nix { };
+      });
 }
