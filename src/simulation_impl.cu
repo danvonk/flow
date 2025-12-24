@@ -2,14 +2,13 @@
 #include "simulation_impl.cuh"
 #include "vtk_writer.hpp"
 
-#include <chrono>
 #include <spdlog/spdlog.h>
 
 SimulationImpl::SimulationImpl(FlowField &field)
     : flow_(field),
       fgh_iterator_(field.view(), stencils::FGHStencil()),
-      wall_v_iterator_(field.view(), stencils::MovingWallVelocityStencil()),
-      wall_fgh_iterator_(field.view(), stencils::MovingWallFGHStencil()),
+      wall_v_iterator_(field.view(), stencils::MovingWallVelocityStencil(), 1, 0),
+      wall_fgh_iterator_(field.view(), stencils::MovingWallFGHStencil(), 1, 0),
       rhs_iterator_(field.view(), stencils::RHSStencil()),
       velocity_stencil_(field.view(), stencils::VelocityStencil()),
       obstacle_stencil_(field.view(), stencils::ObstacleStencil())
@@ -22,9 +21,8 @@ void SimulationImpl::solveTimestep()
   wall_fgh_iterator_.iterate();
   rhs_iterator_.iterate();
 
-  // TODO: solve for pressure
-  const int iters = solver_.solve(flow_.view());
-  spdlog::debug("SORSolver needed {} iterations", iters);
+  const int iters = solver_.solve(flow_);
+  spdlog::info("SORSolver needed {} iterations", iters);
 
   // compute velocity
   velocity_stencil_.iterate();
@@ -41,8 +39,9 @@ void SimulationImpl::run()
   int timesteps = 0;
   VTKWriter writer;
 
-  auto start = std::chrono::steady_clock::now();
+
   while (time < flow_.params()->sim.final_time) {
+  // while (timesteps < 5) {
     auto new_dt = calc_new_timestep(flow_.view());
     solveTimestep();
 
@@ -56,10 +55,4 @@ void SimulationImpl::run()
       spdlog::info("Current time: {}\t Timestep: {}", time, new_dt);
     }
   }
-
-  auto end = std::chrono::steady_clock::now();
-  spdlog::info(
-      "Finished simulation with a duration of {}ms",
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-          .count());
 }
