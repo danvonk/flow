@@ -1,4 +1,3 @@
-#include <iostream>
 
 #include "fields/flow_field.hpp"
 #include "parameters.hpp"
@@ -9,10 +8,17 @@
 #include <cuda_runtime.h>
 #include <spdlog/spdlog.h>
 
+#include <cfenv>
+#include <iostream>
+
+
 namespace po = boost::program_options;
 
 auto main(int argc, char *argv[]) -> int
 {
+  // Since we are using GCC, make use of exceptions on floating point error
+  if (feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT) == -1)
+    spdlog::error("feenableexcept failed!");
 
   // command line options and config parsing
   po::options_description desc("Turbulent Flow Simulator Options");
@@ -58,6 +64,10 @@ auto main(int argc, char *argv[]) -> int
   Simulation flow_sim(ff);
 
   flow_sim.run();
+
+  if (std::fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT)) {
+    spdlog::error("Floating-point exception occurred in simulation!");
+  }
 
   return 0;
 }

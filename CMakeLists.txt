@@ -10,11 +10,11 @@ project(turby
     VERSION 0.1.0
     LANGUAGES C CXX CUDA)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CUDA_ARCHITECTURES 86) # Perhaps change if compat needed
+set(CMAKE_CUDA_ARCHITECTURES "native") # Perhaps change if compat needed
 
 ############################
 ##  Modules and scripts   ##
@@ -28,7 +28,7 @@ include(GNUInstallDirs)                 # This will define the default values fo
 include(InstallRequiredSystemLibraries) # Tell CMake that the `install` target needs to install required system libraries (eg: Windows SDK)
 include(CMakePackageConfigHelpers)      # Helper to create relocatable packages
 
-cmake_policy(SET CMP0167 NEW)
+#cmake_policy(SET CMP0167 NEW)
 
 # Custom modules and scripts
 

@@ -9,6 +9,10 @@ struct FlowFieldView {
   int Nx;
   int Ny;
 
+  // including ghost cells
+  int cellsX;
+  int cellsY;
+
   IntScalarField::IntScalarFieldView obstacles;
   ScalarField::ScalarFieldView p;
   VectorField::VectorFieldView v;
@@ -27,6 +31,8 @@ public:
   {
     return {Nx_,
             Ny_,
+            cellsX_,
+            cellsY_,
             obstacles_.view(),
             pressure_.view(),
             velocity_.view(),
@@ -44,8 +50,11 @@ public:
 
   inline auto params() const { return params_; }
 
+  inline auto obstacles() const { return &obstacles_; }
   inline auto velocity() const { return &velocity_; }
   inline auto pressure() const { return &pressure_; }
+  inline auto fgh() const { return &FGH_; }
+  inline auto rhs() const { return &RHS_; }
 
 protected:
   int Nx_;

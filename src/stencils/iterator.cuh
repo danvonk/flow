@@ -60,7 +60,7 @@ __global__ void apply_top_wall(FlowFieldView flow, Stencil stencil, int i0,
 }
 } // namespace iter_kernels
 
-template <FieldStencil2D Stencil> class FieldIterator {
+template <typename Stencil> class FieldIterator {
 public:
   FieldIterator(FlowFieldView field, Stencil stencil, int low_offset = 0,
                 int high_offset = 0)
@@ -73,7 +73,6 @@ public:
 
   void iterate(cudaStream_t stream = 0)
   {
-    spdlog::info("iterate field...");
     int cellsX = field_.Nx + 3;
     int cellsY = field_.Ny + 3;
 
@@ -82,7 +81,7 @@ public:
     const int j0 = 1 + low_offset_;
     const int j1 = (cellsY - 1) + high_offset_;
 
-    dim3 block(16, 16, 1);
+    dim3 block(TPB);
     dim3 grid(((i1 - i0) + block.x - 1) / block.x,
               ((j1 - j0) + block.y - 1) / block.y, 1);
 
@@ -97,7 +96,7 @@ private:
   int high_offset_;
 };
 
-template <BoundaryStencil2D Stencil> class BoundaryIterator {
+template <typename Stencil> class BoundaryIterator {
 public:
   BoundaryIterator(FlowFieldView field, Stencil stencil, int low_offset = 0,
                    int high_offset = 0)

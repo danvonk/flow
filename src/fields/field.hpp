@@ -19,8 +19,8 @@
 template <typename T = Real> class Field {
 public:
   Field(int Nx, int Ny, int components)
-      : sizeX_(Nx),
-        sizeY_(Ny),
+      : Nx_(Nx),
+        Ny_(Ny),
         components_(components), // scalar, 2D, 3D vector etc.
         size_(components * Nx * Ny * sizeof(T))
   {
@@ -32,20 +32,20 @@ public:
 
   void to_host(std::vector<T> &host) const
   {
-    host.resize(sizeX_ * sizeY_ * components_);
-    cudaMemcpy(host.data(), data_, host.size(), cudaMemcpyDeviceToHost);
+    host.resize(Nx_ * Ny_ * components_);
+    cudaMemcpy(host.data(), data_, size_, cudaMemcpyDeviceToHost);
   }
 
   Field(const Field &) = delete;
   Field &operator=(const Field &) = delete;
 
-  auto getNx() const { return sizeX_; }
-  auto getNy() const { return sizeY_; }
+  auto Nx() const { return Nx_; }
+  auto Ny() const { return Ny_; }
 
 protected:
   T *data_ = nullptr;
-  int sizeX_;
-  int sizeY_;
+  int Nx_;
+  int Ny_;
   int components_;
   int size_;
 };
@@ -67,7 +67,14 @@ public:
     HD inline Real &get(int i, int j) { return data[i + Nx * j]; }
   };
 
-  ScalarFieldView view() const { return {data_, sizeX_, sizeY_}; };
+  ScalarFieldView view() const { return {data_, Nx_, Ny_}; };
+
+  void to_host(std::vector<Real> &host) const
+  {
+    host.resize(Nx_ * Ny_ * components_);
+    cudaMemcpy(host.data(), data_, size_, cudaMemcpyDeviceToHost);
+  }
+
 };
 
 class IntScalarField : public Field<int> {
@@ -86,7 +93,7 @@ public:
     HD inline int &get(int i, int j) { return data[i + Nx * j]; }
   };
 
-  inline IntScalarFieldView view() const { return {data_, sizeX_, sizeY_}; };
+  inline IntScalarFieldView view() const { return {data_, Nx_, Ny_}; };
 };
 
 class VectorField : public Field<> {
@@ -107,5 +114,5 @@ public:
     HD inline Real &v(int i, int j) { return data[2 * (i + Nx * j) + 1]; }
   };
 
-  VectorFieldView view() const { return {data_, sizeX_, sizeY_}; };
+  VectorFieldView view() const { return {data_, Nx_, Ny_}; };
 };

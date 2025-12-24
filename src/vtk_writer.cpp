@@ -12,10 +12,16 @@ void VTKWriter::write_flow_field(FlowField &field, Real time)
   field.velocity()->to_host(velocity_data);
   field.pressure()->to_host(pressure_data);
 
-  // for (auto j = 0; j < field.Ny(); ++j) {
-  //   for (auto i = 0; i < field.Nx(); ++i) {
-  //     std::cout << velocity_data[2 * (i + (field.Nx() + 3) * j) + 0] << ","
-  //               << velocity_data[2 * (i + (field.Nx() + 3) * j) + 1] << " ";
+  const int NxTot = field.cellsX();
+  const int NyTot = field.cellsY();
+
+  // for (int j = 2; j < NyTot - 1; ++j) {
+  //   for (int i = 2; i < NxTot - 1; ++i) {
+  //     auto here = 2 * (i + NxTot * j);
+  //     auto left = 2 * ((i - 1) + NxTot * j);
+  //     auto down = 2 * (i + NxTot * (j - 1));
+  //     std::cout << velocity_data[here + 0] << "," << velocity_data[here + 1]
+  //               << " ";
   //   }
   //   std::cout << '\n';
   // }
@@ -24,19 +30,16 @@ void VTKWriter::write_flow_field(FlowField &field, Real time)
   image->SetOrigin(0, 0, 0);
   image->SetSpacing(field.params()->mesh.mesh_dx, field.params()->mesh.mesh_dy,
                     1.0);
-  image->SetDimensions(field.Nx() + 1, field.Ny() + 1, 1);
+  image->SetDimensions(field.Nx() + 1, field.Ny() + 1, 2);
 
   vtkNew<vtkDoubleArray> velocity;
   velocity->SetName("velocity");
   velocity->SetNumberOfComponents(3);
   velocity->SetNumberOfTuples(field.Nx() * field.Ny());
 
-  const int NxTot = field.Nx() + 3;
-  const int NyTot = field.Ny() + 3;
-
   auto *ptr = velocity->GetPointer(0);
-  for (int j = 2; j <= field.Ny() + 1; ++j) {
-    for (int i = 2; i <= field.Nx() + 1; ++i) {
+  for (int j = 2; j < NyTot - 1; ++j) {
+    for (int i = 2; i < NxTot - 1; ++i) {
       auto here = 2 * (i + NxTot * j);
       auto left = 2 * ((i - 1) + NxTot * j);
       auto down = 2 * (i + NxTot * (j - 1));
@@ -48,7 +51,7 @@ void VTKWriter::write_flow_field(FlowField &field, Real time)
 
       ptr[3 * cell + 0] = u;
       ptr[3 * cell + 1] = v;
-      ptr[3 * cell + 2] = 0.;
+      ptr[3 * cell + 2] = 0.0;
     }
   }
 
@@ -60,21 +63,25 @@ void VTKWriter::write_flow_field(FlowField &field, Real time)
   pressure->SetNumberOfTuples(field.Nx() * field.Ny());
 
   ptr = pressure->GetPointer(0);
-  for (int j = 2; j <= field.Ny() + 1; ++j) {
-    for (int i = 2; i <= field.Nx() + 1; ++i) {
-
+  for (int j = 2; j < NyTot - 1; ++j) {
+    for (int i = 2; i < NxTot - 1; ++i) {
       auto here = 2 * (i + NxTot * j);
       const auto cell = (i - 2) + field.Nx() * (j - 2);
-
       ptr[cell] = here;
     }
   }
-
   image->GetCellData()->AddArray(pressure);
 
   // TODO: use std::format etc.
   char buffer[256];
   sprintf(buffer, "flow%.0f.vti", time * 100);
+
+  // int dims[3];
+  // image->GetDimensions(dims);
+  // auto nCells = image->GetNumberOfCells();
+  // std::cout << "dims: " << dims[0] << "," << dims[1] << "," << dims[2] <<
+  // "\n"; std::cout << "cells: " << nCells << " tuples: " <<
+  // velocity->GetNumberOfTuples() << "\n";
 
   writer_->SetFileName(buffer);
   writer_->SetInputData(image);

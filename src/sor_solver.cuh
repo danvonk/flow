@@ -5,5 +5,8 @@
 
 class SORSolver {
 public:
-  int solve(FlowFieldView field);
+  int solve(FlowField &field);
+
+private:
+  Real *d_sumSq = nullptr;
 };

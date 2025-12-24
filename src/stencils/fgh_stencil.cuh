@@ -13,7 +13,7 @@ struct FGHStencil {
 private:
   __device__ inline Real du2dx(FlowFieldView &field, int i, int j)
   {
-    const auto dx_short = 0.5 * field.v.u(i, j);
+    const auto dx_short = 0.5 * (c_params.mesh.mesh_dx);
     const auto dx_long1 = 0.5 * (c_params.mesh.mesh_dx + c_params.mesh.mesh_dx);
 
     const auto u_0 = field.v.u(i, j);
@@ -244,7 +244,7 @@ public:
       auto diffusion = d2udx2(field, i, j) + d2udy2(field, i, j);
       diffusion *= (1.0 / c_params.sim.reynolds);
 
-      field.fgh.u(i, j) = dt * (advection + diffusion + force);
+      field.fgh.u(i, j) = dt * (diffusion + force);
     }
 
     // compute G
@@ -255,7 +255,7 @@ public:
       auto diffusion = d2vdx2(field, i, j) + d2vdy2(field, i, j);
       diffusion *= (1.0 / c_params.sim.reynolds);
 
-      field.fgh.v(i, j) = dt * (advection + diffusion + force);
+      field.fgh.v(i, j) = dt * (diffusion + force);
     }
   }
 };

@@ -7,6 +7,7 @@
 #include <limits>
 #include <thrust/device_ptr.h>
 #include <thrust/functional.h>
+#include <thrust/iterator/counting_iterator.h>
 #include <thrust/transform_reduce.h>
 
 #include <cmath>
