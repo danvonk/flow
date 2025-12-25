@@ -3,15 +3,15 @@
 #include "config.hpp"
 #include "fields/flow_field.hpp"
 
-#include <vtkImageData.h>
-#include <vtkXMLImageDataWriter.h>
+#include <vtkHDFWriter.h>
+#include <vtkNew.h>
 
 class VTKWriter {
 public:
   VTKWriter() {};
 
-  void write_flow_field(FlowField &field, Real time);
+  void write_flow_field(FlowField &field, int step);
 
 private:
-  vtkNew<vtkXMLImageDataWriter> writer_;
+  vtkNew<vtkHDFWriter> writer_;
 };
