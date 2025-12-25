@@ -244,7 +244,7 @@ public:
       auto diffusion = d2udx2(field, i, j) + d2udy2(field, i, j);
       diffusion *= (1.0 / c_params.sim.reynolds);
 
-      field.fgh.u(i, j) = dt * (diffusion + force);
+      field.fgh.u(i, j) = u_current + dt * (advection + diffusion + force);
     }
 
     // compute G
@@ -255,7 +255,7 @@ public:
       auto diffusion = d2vdx2(field, i, j) + d2vdy2(field, i, j);
       diffusion *= (1.0 / c_params.sim.reynolds);
 
-      field.fgh.v(i, j) = dt * (diffusion + force);
+      field.fgh.v(i, j) = v_current + dt * (advection + diffusion + force);
     }
   }
 };
