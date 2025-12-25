@@ -34,6 +34,7 @@ target_link_libraries(tflow PRIVATE
   CUDA::cublas
   Boost::program_options
   VTK::IOXML
+  VTK::IOHDF
   VTK::IOCore
   VTK::CommonDataModel
   VTK::CommonCore
