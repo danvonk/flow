@@ -1,7 +1,9 @@
 [![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
-# A Direct Numerical Fluid Simulator
+# A CUDA Fluid Simulator
 
-This is a DNS fluid simulator written in CUDA, which currently just supports 2D
-uniform meshes and cavities.
+
+![2D cavity](res/cavity2d.gif)
+
+A direct nuemrical simulation of the navier-stokes equations written in CUDA. It current just supports 2D uniform meshes and the cavitiy scenario.
 
