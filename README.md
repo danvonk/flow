@@ -5,5 +5,5 @@
 
 ![2D cavity](res/cavity2d.gif)
 
-A direct nuemrical simulation of the navier-stokes equations written in CUDA. It current just supports 2D uniform meshes and the cavitiy scenario.
+A direct nuemrical simulation of the navier-stokes equations written in CUDA. It currently just supports 2D uniform meshes and the cavitiy scenario.
 
