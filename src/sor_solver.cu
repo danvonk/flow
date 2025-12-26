@@ -170,7 +170,7 @@ int SORSolver::solve(FlowField &field)
   // }
 
   
-  const int maxIters = 1000;
+  const int maxIters = 100000;
   const Real tol = 1e-4;
   const Real omg = 1.7;
 
@@ -216,37 +216,17 @@ int SORSolver::solve(FlowField &field)
     // red
     rb_sor_pressure_step<<<grid, block>>>(field.view(), aW, aE, aS, aN, inv_aC,
                                           omg, 0);
-    cudaDeviceSynchronize();
-    auto err = cudaGetLastError();
-    if (err != cudaSuccess)
-      printf("CUDA error: %s\n", cudaGetErrorString(err));
 
     // black
     rb_sor_pressure_step<<<grid, block>>>(field.view(), aW, aE, aS, aN, inv_aC,
                                           omg, 1);
-    cudaDeviceSynchronize();
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-      printf("CUDA error: %s\n", cudaGetErrorString(err));
 
     copy_left_right_boundary<<<gridJ, TPB>>>(field.view());
-    cudaDeviceSynchronize();
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-      printf("CUDA error: %s\n", cudaGetErrorString(err));
 
     copy_top_bottom_boundary<<<gridI, TPB>>>(field.view());
-    cudaDeviceSynchronize();
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-      printf("CUDA error: %s\n", cudaGetErrorString(err));
 
     cudaMemset(d_sumSq, 0, sizeof(Real));
     residual_renorm<<<grid, block>>>(field.view(), aW, aE, aS, aN, aC, d_sumSq);
-    cudaDeviceSynchronize();
-    err = cudaGetLastError();
-    if (err != cudaSuccess)
-      printf("CUDA error: %s\n", cudaGetErrorString(err));
 
     Real h_sumSq = 0.0;
     cudaMemcpy(&h_sumSq, d_sumSq, sizeof(Real), cudaMemcpyDeviceToHost);

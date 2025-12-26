@@ -41,7 +41,6 @@ void SimulationImpl::run()
 
 
   while (time < flow_.params()->sim.final_time) {
-  // while (timesteps < 5) {
     auto new_dt = calc_new_timestep(flow_.view());
     solveTimestep();
 
@@ -51,7 +50,6 @@ void SimulationImpl::run()
     if (time_vtk <= time) {
       writer.write_flow_field(flow_, timesteps);
       time_vtk += flow_.params()->sim.vtk_interval;
-
       spdlog::info("Current time: {}\t Timestep: {}", time, new_dt);
     }
   }
