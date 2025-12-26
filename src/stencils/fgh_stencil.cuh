@@ -14,11 +14,11 @@ private:
   __device__ inline Real du2dx(FlowFieldView &field, int i, int j)
   {
     const auto dx_short = 0.5 * (c_params.mesh.mesh_dx);
-    const auto dx_long1 = 0.5 * (c_params.mesh.mesh_dx + c_params.mesh.mesh_dx);
+    const auto dx_long1 = c_params.mesh.mesh_dx;
 
     const auto u_0 = field.v.u(i, j);
     const auto u_M1 = field.v.u(i - 1, j);
-    const auto u_1 = field.v.u(i + 1, 0);
+    const auto u_1 = field.v.u(i + 1, j);
 
     const auto kr = (u_0 + u_1) / 2.0;
     const auto kl = (u_0 + u_M1) / 2.0;
@@ -43,25 +43,14 @@ private:
   {
     const auto dy = c_params.mesh.mesh_dy;
     const auto dyShort = 0.5 * dy;
-    // const auto dyLong0 = 0.5*(lm[mapd(0,-1,0,1)] + lm[mapd(0,0,0,1)]);
     const auto dyLong1 = 0.5 * (dy + dy);
 
     const auto v0 = field.v.v(i, j);
     const auto vM1 = field.v.v(i, j - 1);
     const auto v1 = field.v.v(i, j + 1);
 
-    // const auto kr = (dyLong1 - dyShort) / dyLong1 * v0 + dyShort /
-    // dyLong1 * v1; const auto kl = (dyLong0 - dyShort) / dyLong0 * v0 +
-    // dyShort / dyLong0 * vM1;
     const auto kr = (v0 + v1) / 2;
     const auto kl = (v0 + vM1) / 2;
-
-    /*const auto secondOrder = (((dyLong1 - dyShort) / dyLong1 * v0 +
-       dyShort / dyLong1 * v1) * ((dyLong1 - dyShort) / dyLong1 * v0 + dyShort /
-       dyLong1 * v1)
-        - ((dyLong0 - dyShort) / dyLong0 * v0 + dyShort / dyLong0 * vM1) *
-       ((dyLong0 - dyShort) / dyLong0 * v0 + dyShort / dyLong0 * vM1) ) / (2.0 *
-       dyShort);*/
 
     const auto secondOrder =
         ((v0 + v1) * (v0 + v1) - (v0 + vM1) * (v0 + vM1)) / (4 * dyLong1);
@@ -196,7 +185,7 @@ private:
 
     auto dx = c_params.mesh.mesh_dx;
 
-    return (u_ip1 - 2. * u_i + u_im1) / (dx * dx);
+    return (u_ip1 - 2.0 * u_i + u_im1) / (dx * dx);
   }
 
   __device__ inline Real d2udy2(FlowFieldView &field, int i, int j)
@@ -207,7 +196,7 @@ private:
 
     const auto dy = c_params.mesh.mesh_dy;
 
-    return (u_jp1 - 2. * u_i + u_jm1) / (dy * dy);
+    return (u_jp1 - 2.0 * u_i + u_jm1) / (dy * dy);
   }
 
   __device__ inline Real d2vdx2(FlowFieldView &field, int i, int j)
