@@ -51,7 +51,7 @@ void SimulationImpl::run()
     if (time_vtk <= time) {
       writer.write_flow_field(flow_, timesteps);
       time_vtk += flow_.params()->sim.vtk_interval;
-      spdlog::info("Current time: {}\t Timestep: {}", time, new_dt);
+      spdlog::info("Current time: {:.5f}\t Timestep: {:.5f}", time, new_dt);
     }
   }
 }

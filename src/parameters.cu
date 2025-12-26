@@ -3,6 +3,7 @@
 
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <spdlog/spdlog.h>
 
 namespace pt = boost::property_tree;
 
@@ -15,11 +16,13 @@ static_assert(std::is_standard_layout_v<Parameters>);
 
 Parameters params::load_config(const std::string &file_path)
 {
-  if (file_path.empty())
-    return {};
-
   pt::ptree tree;
-  pt::read_ini(file_path, tree);
+  try {
+    pt::read_ini(file_path, tree);
+  }
+  catch (const boost::property_tree::ini_parser::ini_parser_error &e) {
+      spdlog::warn("While parsing INI file: {}", e.what());
+  }
 
   Parameters p;
   Timestep ts;
@@ -36,8 +39,8 @@ Parameters params::load_config(const std::string &file_path)
   p.sim.vtk_interval = tree.get<Real>("simulation.vtk_interval", 0.1);
 
   // Mesh params
-  p.mesh.lengthX = tree.get<Real>("mesh.lengthX", 1);
-  p.mesh.lengthY = tree.get<Real>("mesh.lengthY", 1);
+  p.mesh.lengthX = tree.get<Real>("mesh.lengthX", 1.0);
+  p.mesh.lengthY = tree.get<Real>("mesh.lengthY", 1.0);
   p.mesh.cellsX = tree.get<int>("mesh.cellsX", 100);
   p.mesh.cellsY = tree.get<int>("mesh.cellsY", 100);
   p.mesh.mesh_dx = p.mesh.lengthX / p.mesh.cellsX;

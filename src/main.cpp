@@ -31,6 +31,8 @@ auto main(int argc, char *argv[]) -> int
     std::cout << desc << '\n';
   }
 
+  spdlog::info("Flow Simulator. Copyright (c) 2025 Dan Vonk");
+
   // init cuda
   int n_devs = 0;
   cudaGetDeviceCount(&n_devs);
@@ -39,7 +41,8 @@ auto main(int argc, char *argv[]) -> int
     cudaGetDeviceProperties(&p, 0);
     cudaSetDevice(0);
 
-    spdlog::info("Initialised CUDA device 0: {}", p.name);
+    spdlog::info("Initialised CUDA device(s):");
+    spdlog::info("\t 0: {}", p.name);
   }
   else {
     spdlog::error("No CUDA devices found.");
@@ -60,10 +63,6 @@ auto main(int argc, char *argv[]) -> int
   Simulation flow_sim(ff);
 
   flow_sim.run();
-
-  if (std::fetestexcept(FE_ALL_EXCEPT & ~FE_INEXACT)) {
-    spdlog::error("Floating-point exception occurred in simulation!");
-  }
 
   return 0;
 }
