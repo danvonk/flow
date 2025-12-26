@@ -16,10 +16,6 @@ namespace po = boost::program_options;
 
 auto main(int argc, char *argv[]) -> int
 {
-  // Since we are using GCC, make use of exceptions on floating point error
-  if (feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT) == -1)
-    spdlog::error("feenableexcept failed!");
-
   // command line options and config parsing
   po::options_description desc("Turbulent Flow Simulator Options");
   desc.add_options()("help", "Prints this message of dubious value.")(

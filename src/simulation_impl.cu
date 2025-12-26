@@ -21,8 +21,9 @@ void SimulationImpl::solveTimestep()
   wall_fgh_iterator_.iterate();
   rhs_iterator_.iterate();
 
-  const int iters = solver_.solve(flow_);
-  spdlog::info("SORSolver needed {} iterations", iters);
+  if (!solver_.solve(flow_)) {
+      spdlog::error("SOR solver diverged.");
+  }
 
   // compute velocity
   velocity_stencil_.iterate();

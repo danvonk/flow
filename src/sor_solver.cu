@@ -6,8 +6,6 @@
 #include "parameters.hpp"
 
 #include <cuda.h>
-#include <vector>
-#include <iostream>
 
 #include <spdlog/spdlog.h>
 
@@ -98,8 +96,8 @@ __global__ void copy_top_bottom_boundary(FlowFieldView field)
   const int ny = field.Ny;
   const int stride = field.p.Nx; // includes ghosts
 
-  // iterate interior i indices: i=2..nx+1 (count nx)
   const int i = 2 + (blockIdx.x * blockDim.x + threadIdx.x);
+
   if (i >= nx + 2)
     return;
 
@@ -133,44 +131,15 @@ __global__ void residual_renorm(FlowFieldView field, Real aW, Real aE, Real aS,
   auto r = field.rhs.data[c] - aW * field.p.data[w] - aE * field.p.data[e] -
            aS * field.p.data[s] - aN * field.p.data[n] - aC * field.p.data[c];
 
-  atomicAdd(sumSq, (Real)r * (Real)r);
+  atomicAdd(sumSq, r * r);
 }
 
 int SORSolver::solve(FlowField &field)
 {
-
-  std::vector<Real> rhs_data;
-  std::vector<Real> velocity_data;
-  field.rhs()->to_host(rhs_data);
-  field.fgh()->to_host(velocity_data);
-
-  auto nxtot = field.rhs()->Nx();
-  auto nytot = field.rhs()->Ny();
-  // spdlog::info("RHS field {}x{}", nxtot, nytot);
-  
-  // for (int j = 0; j < nytot; j++) {
-  //   for (int i = 0; i < nxtot; i++) {
-  //       std::cout << "(" << i << "," << j << "): " << rhs_data[i + nxtot * j] << " ";
-  //   }
-  //   std::cout << '\n';
-  // }
-  // spdlog::info("===");
-                           
+                          
   const int Vx = field.cellsX();
   const int Vy = field.cellsY();
-
-  // spdlog::info("FGH field {}x{}", Vx, Vy);
-  // for (int j = 0; j < Vy; ++j) {
-  //   for (int i = 0; i < Vx; ++i) {
-  //     auto here = 2 * (i + Vx * j);
-  //     std::cout << velocity_data[here + 0] << "," << velocity_data[here + 1]
-  //               << " ";
-  //   }
-  //   std::cout << '\n';
-  // }
-
-  
-  const int maxIters = 100000;
+ 
   const Real tol = 1e-4;
   const Real omg = 1.7;
 
@@ -191,7 +160,7 @@ int SORSolver::solve(FlowField &field)
   const Real aC = -2. * (idx2 + idy2);
   const Real inv_aC = 1.0 / aC;
 
-  dim3 block(16, 16);
+  dim3 block(TPB);
   dim3 grid((nx + block.x - 1) / block.x, (ny + block.y - 1) / block.y);
 
   cudaMalloc(&d_sumSq, sizeof(Real));
@@ -202,17 +171,8 @@ int SORSolver::solve(FlowField &field)
   BadInfo *d_bad = nullptr;
   cudaMalloc(&d_bad, sizeof(BadInfo));
 
-  for (int it = 0; it < maxIters; ++it) {
-
-    find_nan<<<grid, block>>>(field.view(), d_bad);
-    BadInfo h_bad{};
-    cudaMemcpy(&h_bad, d_bad, sizeof(BadInfo), cudaMemcpyDeviceToHost);
-    if (h_bad.found) {
-      const char *what = (h_bad.which == 0) ? "pressure" : "rhs";
-      spdlog::error("NaN found in {} at i={}, j={}", what, h_bad.i, h_bad.j);
-    }
-    cudaMemset(d_bad, 0, sizeof(BadInfo));
-
+  int it = 0;
+  for (; it < max_iters_; ++it) {
     // red
     rb_sor_pressure_step<<<grid, block>>>(field.view(), aW, aE, aS, aN, inv_aC,
                                           omg, 0);
@@ -239,88 +199,5 @@ int SORSolver::solve(FlowField &field)
   }
 
   cudaFree(d_sumSq);
-  return maxIters;
+  return it < max_iters_ - 1;
 }
-
-// int SORSolver::solve(FlowFieldView field)
-// {
-
-//   Real resnorm = std::numeric_limits<Real>::max();
-//   Real tol = 1e-4;
-
-//   Real omg = 1.7;
-//   int iterations = -1;
-//   int it = 0;
-
-//   // only field cells
-//   int nx = field.Nx;
-//   int ny = field.Ny;
-
-//   const auto dx = c_params.mesh.mesh_dx;
-//   const auto dy = c_params.mesh.mesh_dy;
-
-//   do {
-//     for (int j = 2; j < ny + 2; j++) {
-//       for (int i = 2; i < nx + 2; i++) {
-
-//         const Real dx_W = 0.5 * (dx + dx);
-//         const Real dx_E = 0.5 * (dx + dx);
-//         const Real dx_S = 0.5 * (dy + dy);
-//         const Real dx_N = 0.5 * (dy + dy);
-
-//         const Real a_W = 2.0 / (dx_W * (dx_W + dx_E));
-//         const Real a_E = 2.0 / (dx_E * (dx_W + dx_E));
-//         const Real a_N = 2.0 / (dx_N * (dx_N + dx_S));
-//         const Real a_S = 2.0 / (dx_S * (dx_N + dx_S));
-//         const Real a_C = -2.0 / (dx_E * dx_W) - 2.0 / (dx_N * dx_S);
-
-//         const Real gaussSeidel =
-//             1.0 / a_C *
-//             (field.rhs.get(i, j) - a_W * field.p.get(i - 1, j) -
-//              a_E * field.p.get(i + 1, j) - a_S * field.p.get(i, j - 1) -
-//              a_N * field.p.get(i, j + 1));
-
-//         field.p.get(i, j) = omg * gaussSeidel + (1.0 - omg) * field.p.get(i,
-//         j);
-//       }
-//     }
-
-//     resnorm = 0.0;
-//     for (int j = 2; j < ny + 2; j++) {
-//       for (int i = 2; i < nx + 2; i++) {
-
-//         const Real dx_W = 0.5 * (dx + dx);
-//         const Real dx_E = 0.5 * (dx + dx);
-//         const Real dx_S = 0.5 * (dy + dy);
-//         const Real dx_N = 0.5 * (dy + dy);
-
-//         const Real a_W = 2.0 / (dx_W * (dx_W + dx_E));
-//         const Real a_E = 2.0 / (dx_E * (dx_W + dx_E));
-//         const Real a_N = 2.0 / (dx_N * (dx_N + dx_S));
-//         const Real a_S = 2.0 / (dx_S * (dx_N + dx_S));
-//         const Real a_C = -2.0 / (dx_E * dx_W) - 2.0 / (dx_N * dx_S);
-
-//         const Real residual =
-//             field.rhs.get(i, j) - a_W * field.p.get(i - 1, j) -
-//             a_E * field.p.get(i + 1, j) - a_S * field.p.get(i, j - 1) -
-//             a_N * field.p.get(i, j + 1) - a_C * field.p.get(i, j);
-//         resnorm += residual * residual;
-//       }
-//     }
-//     resnorm = sqrt(resnorm / (nx * ny));
-
-//     for (int j = 2; j < ny + 2; j++) {
-//       field.p.get(1, j) = field.p.get(2, j);
-//       field.p.get(nx + 2, j) = field.p.get(nx + 1, j);
-//     }
-
-//     for (int i = 2; i < nx + 2; i++) {
-//       field.p.get(i, 1) = field.p.get(i, 2);
-//       field.p.get(i, ny + 2) = field.p.get(i, ny + 1);
-//     }
-//     iterations--;
-//     it++;
-//   } while (resnorm > tol && iterations);
-
-//   return it;
-// }

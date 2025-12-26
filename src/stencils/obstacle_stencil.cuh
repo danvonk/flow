@@ -7,7 +7,7 @@
 
 namespace stencils {
 struct ObstacleStencil {
-  __device__ void operator()(FlowFieldView &field, int i, int j)
+  __device__ void operator()(FlowFieldView field, int i, int j)
   {
     const int obstacle = field.obstacles.get(i, j);
     const auto dx = c_params.mesh.mesh_dx;

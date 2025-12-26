@@ -12,13 +12,13 @@ struct MovingWallVelocityStencil {
   __device__ void apply_left_wall(FlowFieldView &field, int i, int j)
   {
     field.v.u(i, j) = c_params.wall.vector_left[0];
-    field.v.v(i, j) = 2 * c_params.wall.vector_left[1] - field.v.v(i + 1, j);
+    field.v.v(i, j) = 2. * c_params.wall.vector_left[1] - field.v.v(i + 1, j);
   }
 
   __device__ void apply_right_wall(FlowFieldView &field, int i, int j)
   {
     field.v.u(i - 1, j) = c_params.wall.vector_right[0];
-    field.v.v(i, j) = 2 * c_params.wall.vector_right[1] - field.v.v(i - 1, j);
+    field.v.v(i, j) = 2. * c_params.wall.vector_right[1] - field.v.v(i - 1, j);
   }
 
   __device__ void apply_top_wall(FlowFieldView &field, int i, int j)

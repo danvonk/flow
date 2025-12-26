@@ -7,7 +7,7 @@
 
 namespace stencils {
 struct VelocityStencil {
-  __device__ void operator()(FlowFieldView &field, int i, int j)
+  __device__ void operator()(FlowFieldView field, int i, int j)
   {
     int obstacle = field.obstacles.get(i, j);
     // if fluid cell
